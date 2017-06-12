@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
+  <Metadata>
+    <Identity Id="d57cc223-384b-41cc-b5d0-814a71ce8d61" Version="1.2.0.35" Language="en-US" Publisher="Eric Labashosky" />
+    <DisplayName>CrmCodeGenerator.VSPackage</DisplayName>
+    <Description xml:space="preserve">Allows you to generate CRM 2011/2013/2015/2016 schema files.  Much like CrmSrvUtil.exe but with a lot more features; select entities (smaller code/assembly), runs in VisualStudio, T4 templates for control of how code is generated (also allows other languages),  Template is saved to project,   connection info save to SUO &amp;  so that you can modify it as needed. 
+</Description>
+    <MoreInfo>https://crmcodegenerator.codeplex.com/</MoreInfo>
+    <License>license.txt</License>
+    <ReleaseNotes>README.txt</ReleaseNotes>
+    <Icon>Resources\Generator.ico</Icon>
+    <PreviewImage>Resources\Generator.png</PreviewImage>
+    <Tags>CRM</Tags>
+  </Metadata>
+  <Installation InstalledByMsi="false" AllUsers="true">
+    <InstallationTarget Version="[13.0,17.0)" Id="Microsoft.VisualStudio.Pro" />
+    <InstallationTarget Version="[13.0,17.0)" Id="Microsoft.VisualStudio.Community" />
+  </Installation>
+  <Dependencies>
+    <Dependency Id="Microsoft.VisualStudio.MPF.11.0" DisplayName="Visual Studio MPF 11.0" d:Source="Installed" Version="11.0" />
+  </Dependencies>
+  <Assets>
+    <Asset Type="Microsoft.VisualStudio.VsPackage" d:Source="Project" d:ProjectName="%CurrentProject%" Path="|%CurrentProject%;PkgdefProjectOutputGroup;BuiltProjectOutputGroup;BuiltProjectOutputGroupDependencies;GetCopyToOutputDirectoryItems;SatelliteDllsProjectOutputGroup|" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="Microsoft.Xrm.Sdk.dll" AssemblyName="Microsoft.Xrm.Sdk, Version=8.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="Microsoft.IdentityModel.Clients.ActiveDirectory.dll" AssemblyName="Microsoft.IdentityModel.Clients.ActiveDirectory, Version=2.18.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="Microsoft.Xrm.Tooling.Connector.dll" AssemblyName="Microsoft.Xrm.Tooling.Connector, Version=2.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+  </Assets>
+  <Prerequisites>
+    <Prerequisite Id="Microsoft.Net.Component.4.6.1.SDK" Version="[15.0.26208.0,16.0)" DisplayName=".NET Framework 4.6.1 SDK" />
+  </Prerequisites>
+</PackageManifest>

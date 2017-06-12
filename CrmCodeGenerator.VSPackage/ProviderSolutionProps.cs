@@ -1,0 +1,52 @@
+﻿/***************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+This code is licensed under the Visual Studio SDK license terms.
+THIS CODE IS PROVIDED *AS IS* WITHOUT WARRANTY OF
+ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING ANY
+IMPLIED WARRANTIES OF FITNESS FOR A PARTICULAR
+PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
+
+***************************************************************************/
+
+using Microsoft.VisualStudio.Shell;
+using System;
+using System.Globalization;
+
+namespace CrmCodeGenerator.VSPackage
+{
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
+    internal sealed class ProvideSolutionProps : RegistrationAttribute
+    {
+        private string _propName;
+
+        public ProvideSolutionProps(string propName)
+        {
+            _propName = propName;
+        }
+
+        public override void Register(RegistrationContext context)
+        {
+            context.Log.WriteLine(string.Format(CultureInfo.InvariantCulture, "ProvideSolutionProps: ({0} = {1})", context.ComponentType.GUID.ToString("B"), PropName));
+
+            Key childKey = null;
+
+            try
+            {
+                childKey = context.CreateKey(string.Format(CultureInfo.InvariantCulture, "{0}\\{1}", "SolutionPersistence", PropName));
+
+                childKey.SetValue(string.Empty, context.ComponentType.GUID.ToString("B"));
+            }
+            finally
+            {
+                if (childKey != null) childKey.Close();
+            }
+        }
+
+        public override void Unregister(RegistrationContext context)
+        {
+            context.RemoveKey(string.Format(CultureInfo.InvariantCulture, "{0}\\{1}", "SolutionPersistence", PropName));
+        }
+
+        public string PropName { get { return _propName; } }
+    }
+}
