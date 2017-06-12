@@ -3,7 +3,13 @@ Visual Studio extension that will generated the early bound classes for for Micr
 
 Fork from https://crmcodegenerator.codeplex.com/
 
-## N
+## Latest Release
+
+### Version 2.0
+
+- Support for Visual Studio 2017
+- Add Connection String 
+- Fix Connect to CRM Online
 
 ## Benefits of using this tool over the standard tool
 
