@@ -209,6 +209,7 @@ namespace CrmCodeGenerator.VSPackage
 
         public int ReadSolutionProps(IVsHierarchy pHierarchy, string pszProjectName, string pszProjectMk, string pszKey, int fPreLoad, IPropertyBag pPropBag)
         {
+          
             if (_strSolutionPersistanceKey.CompareTo(pszKey) == 0)
             {
                 var defaultServer = "crm.dynamics.com";
