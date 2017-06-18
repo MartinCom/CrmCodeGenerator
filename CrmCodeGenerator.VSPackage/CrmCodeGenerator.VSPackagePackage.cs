@@ -76,6 +76,7 @@ namespace CrmCodeGenerator.VSPackage
                 Assembly.LoadFile(directory + "\\Microsoft.Xrm.Sdk.Deployment.dll"));
 
             Debug.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+
             base.Initialize();
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
@@ -86,8 +87,12 @@ namespace CrmCodeGenerator.VSPackage
                 MenuCommand tempalteItem = new MenuCommand(AddTemplateCallback, templateCmd);
                 mcs.AddCommand(tempalteItem);
             }
+
             Configuration.Instance.DTE = this.GetService(typeof(SDTE)) as EnvDTE80.DTE2;
+
             AdviseSolutionEvents();
+
+            Configuration.Instance.Settings = ConfigurationFile.ReadFromJsonFile();
         }
 
         protected override void Dispose(bool disposing)
@@ -209,7 +214,7 @@ namespace CrmCodeGenerator.VSPackage
 
         public int ReadSolutionProps(IVsHierarchy pHierarchy, string pszProjectName, string pszProjectMk, string pszKey, int fPreLoad, IPropertyBag pPropBag)
         {
-          
+            //todo mg: remove read from solution
             if (_strSolutionPersistanceKey.CompareTo(pszKey) == 0)
             {
                 var defaultServer = "crm.dynamics.com";
