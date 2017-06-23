@@ -369,6 +369,7 @@ namespace CrmCodeGenerator.VSPackage
             try
             {
                 AddTemplate();
+
                 settings.IsActive = true;  // start saving the properties to the *.sln
             }
             catch (UserException e)
@@ -399,50 +400,94 @@ namespace CrmCodeGenerator.VSPackage
                 if (((AddTemplate)sender).Canceled == true)
                     return;
 
-                var templatePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), m.Props.Template));  //GetFullpath removes un-needed relative paths  (ie if you are putting something in the solution directory)
+                AddTempleteCloseEvent(project, m);
 
-                if (System.IO.File.Exists(templatePath))
-                {
-                    var results = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, "'" + templatePath + "' already exists, are you sure you want to overwrite?", "Overwrite", OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                    if (results != 6)
-                        return;
-
-                    //if the window is open we have to close it before we overwrite it.
-                    var pi = project.GetProjectItem(m.Props.Template);
-                    if (pi != null && pi.Document != null)
-                        pi.Document.Close(vsSaveChanges.vsSaveChangesNo);
-                }
-
-                var templateSamplesPath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates");
-                var defaultTemplatePath = System.IO.Path.Combine(templateSamplesPath, m.DefaultTemplate.SelectedValue.ToString());
-                if (!System.IO.File.Exists(defaultTemplatePath))
-                {
-                    throw new UserException("T4Path: " + defaultTemplatePath + " is missing or you can access it.");
-                }
-
-                var dir = System.IO.Path.GetDirectoryName(templatePath);
-                if (!System.IO.Directory.Exists(dir))
-                {
-                    System.IO.Directory.CreateDirectory(dir);
-                }
-
-                Status.Update("Adding " + templatePath + " to project");
-                // When you add a TT file to visual studio, it will try to automatically compile it,
-                // if there is error (and there will be error because we have custom generator)
-                // the error will persit until you close Visual Studio. The solution is to add
-                // a blank file, then overwrite it
-                // http://stackoverflow.com/questions/17993874/add-template-file-without-custom-tool-to-project-programmatically
-                var blankTemplatePath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates\Blank.tt");
-                System.IO.File.Copy(blankTemplatePath, templatePath, true);
-
-                var p = project.ProjectItems.AddFromFile(templatePath);
-                p.Properties.SetValue("CustomTool", "");
-
-                System.IO.File.Copy(defaultTemplatePath, templatePath, true);
-                p.Properties.SetValue("CustomTool", typeof(CrmCodeGenerator2011).Name);
+                AddCodeGenerationJson();
             };
             m.ShowModal();
         }
+
+        private void AddTempleteCloseEvent(Project project, AddTemplate m)
+        {
+            var templatePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), m.Props.Template));  //GetFullpath removes un-needed relative paths  (ie if you are putting something in the solution directory)
+
+            if (System.IO.File.Exists(templatePath))
+            {
+                var results = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, "'" + templatePath + "' already exists, are you sure you want to overwrite?", "Overwrite", OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                if (results != 6)
+                    return;
+
+                //if the window is open we have to close it before we overwrite it.
+                var pi = project.GetProjectItem(m.Props.Template);
+                if (pi != null && pi.Document != null)
+                    pi.Document.Close(vsSaveChanges.vsSaveChangesNo);
+            }
+
+            var templateSamplesPath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates");
+            var defaultTemplatePath = System.IO.Path.Combine(templateSamplesPath, m.DefaultTemplate.SelectedValue.ToString());
+            if (!System.IO.File.Exists(defaultTemplatePath))
+            {
+                throw new UserException("T4Path: " + defaultTemplatePath + " is missing or you can access it.");
+            }
+
+            var dir = System.IO.Path.GetDirectoryName(templatePath);
+            if (!System.IO.Directory.Exists(dir))
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+
+            Status.Update("Adding " + templatePath + " to project");
+            // When you add a TT file to visual studio, it will try to automatically compile it,
+            // if there is error (and there will be error because we have custom generator)
+            // the error will persit until you close Visual Studio. The solution is to add
+            // a blank file, then overwrite it
+            // http://stackoverflow.com/questions/17993874/add-template-file-without-custom-tool-to-project-programmatically
+            var blankTemplatePath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates\Blank.tt");
+            System.IO.File.Copy(blankTemplatePath, templatePath, true);
+
+            var p = project.ProjectItems.AddFromFile(templatePath);
+            p.Properties.SetValue("CustomTool", "");
+
+            System.IO.File.Copy(defaultTemplatePath, templatePath, true);
+            p.Properties.SetValue("CustomTool", typeof(CrmCodeGenerator2011).Name);
+        }
+
+        private void AddCodeGenerationJson()
+        {
+            var dte2 = this.GetService(typeof(SDTE)) as EnvDTE80.DTE2;
+
+            var project = dte2.GetSelectedProject();
+            if (project == null || string.IsNullOrWhiteSpace(project.FullName))
+            {
+                throw new UserException("Please select a project first");
+            }
+
+            string configFileName = "codegeneratorconfig.json";
+
+
+            var configPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), configFileName));
+
+            if (System.IO.File.Exists(configPath))
+            {
+                var results = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, "'" + configPath + "' already exists, are you sure you want to overwrite?", "Overwrite", OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                if (results != 6)
+                    return;
+
+                //if the window is open we have to close it before we overwrite it.
+                var pi = project.GetProjectItem(configFileName);
+                if (pi != null && pi.Document != null)
+                    pi.Document.Close(vsSaveChanges.vsSaveChangesNo);
+            }
+
+            var dir = System.IO.Path.GetDirectoryName(configPath);
+            if (!System.IO.Directory.Exists(dir))
+            {
+                System.IO.Directory.CreateDirectory(dir);
+            }
+
+            Status.Update("Adding " + configPath + " to project");
+        }
+        
 
         #region SolutionEvents
 
