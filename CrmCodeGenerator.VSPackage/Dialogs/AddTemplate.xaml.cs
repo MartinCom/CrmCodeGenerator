@@ -1,6 +1,4 @@
-﻿using CrmCodeGenerator.VSPackage.Helpers;
-using EnvDTE;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -8,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using CrmCodeGenerator.VSPackage.Helpers;
+using EnvDTE;
 
 namespace CrmCodeGenerator.VSPackage.Dialogs
 {
@@ -43,14 +43,13 @@ namespace CrmCodeGenerator.VSPackage.Dialogs
             InitializeComponent();
 
             var main = dte.GetMainWindow();
-            this.Owner = main;
-            //Loaded += delegate { this.CenterWindow(main); };
+            Owner = main;
 
             _Props = new AddTemplateProp();
-            this.DataContext = Props;
+            DataContext = Props;
 
             var samplesPath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates");
-            var dir = new DirectoryInfo(samplesPath);
+            DirectoryInfo dir = new DirectoryInfo(samplesPath);
             Props.TemplateList = new ObservableCollection<String>(dir.GetFiles().Select(x => x.Name).Where(x => !x.Equals("Blank.tt")).ToArray());
             Props.Template = "CrmSchema.tt";
             Props.Folder = project.GetProjectDirectory();
@@ -64,21 +63,19 @@ namespace CrmCodeGenerator.VSPackage.Dialogs
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            this.DefaultTemplate.SelectedIndex = 0;
+            DefaultTemplate.SelectedIndex = 0;
         }
 
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
-            //this.DialogResult = false;
             _Canceled = true;
-            this.Close();
+            Close();
         }
 
         private void Add_Click(object sender, RoutedEventArgs e)
         {
-            //this.DialogResult = true;
             _Canceled = false;
-            this.Close();
+            Close();
         }
     }
 

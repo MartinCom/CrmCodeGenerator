@@ -1,4 +1,11 @@
-﻿using CrmCodeGenerator.VSPackage.Dialogs;
+﻿using System;
+using System.ComponentModel.Design;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using CrmCodeGenerator.VSPackage.Dialogs;
 using CrmCodeGenerator.VSPackage.Helpers;
 using CrmCodeGenerator.VSPackage.Model;
 using EnvDTE;
@@ -6,13 +13,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using System;
-using System.ComponentModel.Design;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
 
 namespace CrmCodeGenerator.VSPackage
 {
@@ -393,16 +393,17 @@ namespace CrmCodeGenerator.VSPackage
                 throw new UserException("Please select a project first");
             }
 
-            var m = new AddTemplate(dte2, project);
+            AddTemplate m = new AddTemplate(dte2, project);
+
             m.Closed += (sender, e) =>
             {
                 // logic here Will be called after the child window is closed
                 if (((AddTemplate)sender).Canceled == true)
                     return;
 
-                AddTempleteCloseEvent(project, m);
-
                 AddCodeGenerationJson();
+
+                AddTempleteCloseEvent(project, m);
             };
             m.ShowModal();
         }
@@ -464,7 +465,6 @@ namespace CrmCodeGenerator.VSPackage
 
             string configFileName = "codegeneratorconfig.json";
 
-
             var configPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), configFileName));
 
             if (System.IO.File.Exists(configPath))
@@ -486,8 +486,15 @@ namespace CrmCodeGenerator.VSPackage
             }
 
             Status.Update("Adding " + configPath + " to project");
+
+            var blankConfigPath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\codegeneratorconfig.json");
+            System.IO.File.Copy(blankConfigPath, configPath, true);
+
+            var p = project.ProjectItems.AddFromFile(configPath);
+            p.Properties.SetValue("CustomTool", "");
+
+            Status.Update("Add " + configPath + " to project");
         }
-        
 
         #region SolutionEvents
 
