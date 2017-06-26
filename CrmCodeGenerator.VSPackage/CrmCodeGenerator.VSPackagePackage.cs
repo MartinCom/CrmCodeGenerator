@@ -92,7 +92,7 @@ namespace CrmCodeGenerator.VSPackage
 
             AdviseSolutionEvents();
 
-            Configuration.Instance.Settings = ConfigurationFile.ReadFromJsonFile();
+            Configuration.Instance.Settings = ConfigurationFile.ReadFromJsonFile(Configuration.Instance.DTE);
         }
 
         protected override void Dispose(bool disposing)

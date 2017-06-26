@@ -7,8 +7,8 @@ namespace CrmCodeGenerator.VSPackage.Helpers
     {
         public static bool HasProjectItem(this Project project, string projectFile)
         {
-            var projectItem = project.GetProjectItem(projectFile);
-            return projectItem == null ? false : true;
+            ProjectItem projectItem = project.GetProjectItem(projectFile);
+            return projectItem != null;
         }
 
         public static ProjectItem GetProjectItem(this Project project, string projectFile)

@@ -1,14 +1,27 @@
-﻿using CrmCodeGenerator.VSPackage.Model;
+﻿using System;
+using CrmCodeGenerator.VSPackage.Model;
+using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.Shell.Interop;
 using Newtonsoft.Json;
 
 namespace CrmCodeGenerator.VSPackage.Helpers
 {
     public static class ConfigurationFile
     {
-        public static Settings ReadFromJsonFile()
+        public static Settings ReadFromJsonFile(DTE2 dte2)
         {
-            //todo read from file
-            string configurationJson = "{\"UseSSL\":true,\"UseIFD\":false,\"ServerName\":\"servername\",\"UseOnline\":false,\"Domain\":\"defaultdomain\",\"UseOffice365\":false,\"ServerPort\":null,\"HomeRealm\":\"\",\"UseWindowsAuth\":false,\"IsActive\":false,\"CrmOrg\":\"DEV-CRM\",\"EntitiesToIncludeString\":\"account, contact\",\"IncludeNonStandard\":false}";
+            Project project = dte2.GetSelectedProject();
+            //if (project == null || string.IsNullOrWhiteSpace(project.FullName))
+            //{
+            //    throw new UserException("Please select a project first");
+            //}
+            
+            var configPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"));
+
+            string configurationJson = System.IO.File.ReadAllText(configPath);
+            
+            //string configurationJson = "{\"UseSSL\":true,\"UseIFD\":false,\"ServerName\":\"servername\",\"UseOnline\":false,\"Domain\":\"defaultdomain\",\"UseOffice365\":false,\"ServerPort\":null,\"HomeRealm\":\"\",\"UseWindowsAuth\":false,\"IsActive\":false,\"CrmOrg\":\"DEV-CRM\",\"EntitiesToIncludeString\":\"account, contact\",\"IncludeNonStandard\":false}";
 
             SettingsModel model = JsonConvert.DeserializeObject<SettingsModel>(configurationJson);
 
@@ -56,5 +69,6 @@ namespace CrmCodeGenerator.VSPackage.Helpers
 
             string jsonConf = JsonConvert.SerializeObject(model);
         }
+        
     }
 }

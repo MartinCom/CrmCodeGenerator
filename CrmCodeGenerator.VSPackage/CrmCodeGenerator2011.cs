@@ -111,8 +111,10 @@ namespace CrmCodeGenerator.VSPackage
             if (context == null)
             {
                 var dte = Package.GetGlobalService(typeof(SDTE)) as EnvDTE80.DTE2;
+                settings = ConfigurationFile.ReadFromJsonFile(dte);
                 var m = new Login(dte, settings);
                 m.ShowDialog();
+                
                 context = m.Context;
                 m = null;
 
