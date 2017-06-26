@@ -420,9 +420,8 @@ namespace CrmCodeGenerator.VSPackage
                     return;
 
                 //if the window is open we have to close it before we overwrite it.
-                var pi = project.GetProjectItem(m.Props.Template);
-                if (pi != null && pi.Document != null)
-                    pi.Document.Close(vsSaveChanges.vsSaveChangesNo);
+                ProjectItem pi = project.GetProjectItem(m.Props.Template);
+                pi?.Document?.Close(vsSaveChanges.vsSaveChangesNo);
             }
 
             var templateSamplesPath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates");

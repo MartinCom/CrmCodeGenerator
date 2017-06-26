@@ -1,4 +1,9 @@
-﻿using CrmCodeGenerator.VSPackage.Dialogs;
+﻿using System;
+using System.CodeDom.Compiler;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using CrmCodeGenerator.VSPackage.Dialogs;
 using CrmCodeGenerator.VSPackage.Helpers;
 using CrmCodeGenerator.VSPackage.Model;
 using CrmCodeGenerator.VSPackage.T4;
@@ -9,11 +14,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
-using System;
-using System.CodeDom.Compiler;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 
 //using VSLangProj80;
 

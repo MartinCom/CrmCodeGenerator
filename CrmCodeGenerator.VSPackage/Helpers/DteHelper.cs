@@ -1,5 +1,5 @@
-﻿using EnvDTE;
-using System;
+﻿using System;
+using EnvDTE;
 
 namespace CrmCodeGenerator.VSPackage.Helpers
 {
