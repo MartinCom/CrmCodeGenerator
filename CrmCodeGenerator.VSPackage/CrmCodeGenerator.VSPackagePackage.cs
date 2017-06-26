@@ -401,17 +401,18 @@ namespace CrmCodeGenerator.VSPackage
                 if (((AddTemplate)sender).Canceled == true)
                     return;
 
-                AddCodeGenerationJson();
+                var templatePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), m.Props.Template));  //GetFullpath removes un-needed relative paths  (ie if you are putting something in the solution directory)
+                var configPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"));
 
-                AddTempleteCloseEvent(project, m);
+                AddFileToProject(project, m, configPath);
+
+                AddFileToProject(project, m, templatePath, true);
             };
             m.ShowModal();
         }
 
-        private void AddTempleteCloseEvent(Project project, AddTemplate m)
+        private void AddFileToProject(Project project, AddTemplate m, string templatePath, bool runCustomTool = false)
         {
-            var templatePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), m.Props.Template));  //GetFullpath removes un-needed relative paths  (ie if you are putting something in the solution directory)
-
             if (System.IO.File.Exists(templatePath))
             {
                 var results = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, "'" + templatePath + "' already exists, are you sure you want to overwrite?", "Overwrite", OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
@@ -450,50 +451,11 @@ namespace CrmCodeGenerator.VSPackage
             p.Properties.SetValue("CustomTool", "");
 
             System.IO.File.Copy(defaultTemplatePath, templatePath, true);
-            p.Properties.SetValue("CustomTool", typeof(CrmCodeGenerator2011).Name);
-        }
 
-        private void AddCodeGenerationJson()
-        {
-            var dte2 = this.GetService(typeof(SDTE)) as EnvDTE80.DTE2;
-
-            var project = dte2.GetSelectedProject();
-            if (project == null || string.IsNullOrWhiteSpace(project.FullName))
+            if (runCustomTool)
             {
-                throw new UserException("Please select a project first");
+                p.Properties.SetValue("CustomTool", typeof(CrmCodeGenerator2011).Name);
             }
-
-            string configFileName = "codegeneratorconfig.json";
-
-            var configPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), configFileName));
-
-            if (System.IO.File.Exists(configPath))
-            {
-                var results = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, "'" + configPath + "' already exists, are you sure you want to overwrite?", "Overwrite", OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                if (results != 6)
-                    return;
-
-                //if the window is open we have to close it before we overwrite it.
-                var pi = project.GetProjectItem(configFileName);
-                if (pi != null && pi.Document != null)
-                    pi.Document.Close(vsSaveChanges.vsSaveChangesNo);
-            }
-
-            var dir = System.IO.Path.GetDirectoryName(configPath);
-            if (!System.IO.Directory.Exists(dir))
-            {
-                System.IO.Directory.CreateDirectory(dir);
-            }
-
-            Status.Update("Adding " + configPath + " to project");
-
-            var blankConfigPath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\codegeneratorconfig.json");
-            System.IO.File.Copy(blankConfigPath, configPath, true);
-
-            var p = project.ProjectItems.AddFromFile(configPath);
-            p.Properties.SetValue("CustomTool", "");
-
-            Status.Update("Add " + configPath + " to project");
         }
 
         #region SolutionEvents
