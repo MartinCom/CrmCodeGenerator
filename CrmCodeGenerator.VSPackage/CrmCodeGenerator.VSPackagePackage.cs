@@ -39,7 +39,7 @@ namespace CrmCodeGenerator.VSPackage
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [Guid(GuidList.guidCrmCodeGenerator_VSPackagePkgString)]
     [ProvideSolutionProps(_strSolutionPersistanceKey)]
-    public sealed class CrmCodeGenerator_VSPackagePackage : Package, IVsPersistSolutionProps, IVsPersistSolutionOpts, IVsSolutionEvents3
+    public sealed class CrmCodeGenerator_VSPackagePackage : Package, IVsPersistSolutionOpts, IVsSolutionEvents3
     {
         /// <summary>
         /// Default constructor of the package.
@@ -135,129 +135,12 @@ namespace CrmCodeGenerator.VSPackage
 
         #region IVsPersistSolutionProps Implementation Code
 
-        private Settings settings = Configuration.Instance.Settings;
+        private readonly Settings _settings = Configuration.Instance.Settings;
 
         private const string _strSolutionPersistanceKey = "CrmCodeGeneration";
-        private const string _strCrmUrl = "CrmUrl";
-        private const string _strUseSSL = "UseSSL";
-        private const string _strUseIFD = "UseIFD";
-        private const string _strUseOnline = "UseOnline";
-        private const string _strUseOffice365 = "UseOffice365";
-        private const string _strServerPort = "ServerPort";
-        private const string _strServerName = "ServerName";
-        private const string _strHomeRealm = "HomeRealm";
         private const string _strUsername = "Username";
         private const string _strPassword = "Password";
-        private const string _strDomain = "Domain";
-        private const string _strUseWindowsAuth = "WindowsAuthorization";
-        private const string _strOrganization = "Organization";
-        private const string _strIncludeEntities = "IncludeEntities";
-        private const string _strIncludeNonStandard = "IncludeNonStandard";
-
-        #region Solution Properties
-
-        public int QuerySaveSolutionProps(IVsHierarchy pHierarchy, VSQUERYSAVESLNPROPS[] pqsspSave)
-        {
-            if (pHierarchy != null)   // if this contains something, then VS is asking for Solution Properties of a PROJECT,
-                pqsspSave[0] = VSQUERYSAVESLNPROPS.QSP_HasNoProps;
-            else if (settings.Dirty)
-                pqsspSave[0] = VSQUERYSAVESLNPROPS.QSP_HasDirtyProps;
-            else
-                pqsspSave[0] = VSQUERYSAVESLNPROPS.QSP_HasNoDirtyProps;
-            return VSConstants.S_OK;
-        }
-
-        public int SaveSolutionProps([InAttribute] IVsHierarchy pHierarchy, [InAttribute] IVsSolutionPersistence pPersistence)
-        {
-            // This function gets called by the shell after determining the package has dirty props.
-            // The package will pass in the key under which it wants to save its properties,
-            // and the IDE will call back on WriteSolutionProps
-
-            // The properties will be saved in the Pre-Load section
-            // When the solution will be reopened, the IDE will call our package to load them back before the projects in the solution are actually open
-            // This could help if the source control package needs to persist information like projects translation tables, that should be read from the suo file
-            // and should be available by the time projects are opened and the shell start calling IVsSccEnlistmentPathTranslation functions.
-            //if(settings.Dirty)
-            if (settings.IsActive)
-                pPersistence.SavePackageSolutionProps(1, null, this, _strSolutionPersistanceKey);
-
-            settings.Dirty = false;
-
-            return VSConstants.S_OK;
-        }
-
-        public int WriteSolutionProps([InAttribute] IVsHierarchy pHierarchy, [InAttribute] string pszKey, [InAttribute] IPropertyBag pPropBag)
-        {
-            pPropBag.WriteBool(_strUseSSL, settings.UseSSL);
-            pPropBag.WriteBool(_strUseIFD, settings.UseIFD);
-            pPropBag.WriteBool(_strUseOnline, settings.UseOnline);
-            pPropBag.WriteBool(_strUseOffice365, settings.UseOffice365);
-            pPropBag.WriteBool(_strUseOffice365, settings.UseOffice365);
-
-            pPropBag.Write(_strServerName, settings.ServerName);
-            pPropBag.Write(_strServerPort, settings.ServerPort);
-            pPropBag.Write(_strHomeRealm, settings.HomeRealm);
-
-            //pPropBag.Write(_strCrmUrl, settings.CrmSdkUrl);
-            pPropBag.Write(_strDomain, settings.Domain);
-            pPropBag.Write(_strUseWindowsAuth, settings.UseWindowsAuth.ToString());
-            //pPropBag.Write(_strUsername, settings.Username);
-            //pPropBag.Write(_strPassword, settings.Password);
-
-            pPropBag.Write(_strOrganization, settings.CrmOrg);
-            pPropBag.Write(_strIncludeEntities, settings.EntitiesToIncludeString);
-            pPropBag.WriteBool(_strIncludeNonStandard, settings.IncludeNonStandard);
-            settings.Dirty = false;
-
-            return VSConstants.S_OK;
-        }
-
-        public int ReadSolutionProps(IVsHierarchy pHierarchy, string pszProjectName, string pszProjectMk, string pszKey, int fPreLoad, IPropertyBag pPropBag)
-        {
-            //todo mg: remove read from solution
-            if (_strSolutionPersistanceKey.CompareTo(pszKey) == 0)
-            {
-                var defaultServer = "crm.dynamics.com";
-                var defaultSSL = false;
-                var defaultPort = "";
-                var defaultOnline = true;
-
-                // This is to convert the earlier settings
-                var oldServerSetting = pPropBag.Read(_strCrmUrl, "");
-                if (!string.IsNullOrWhiteSpace(oldServerSetting))
-                {
-                    Uri oldServer = new Uri(oldServerSetting);
-                    defaultServer = oldServer.Host;
-                    defaultSSL = (oldServer.Scheme == "https");
-                    defaultPort = oldServer.Port.ToString();
-                    defaultOnline = (oldServer.Host.ToLower() == "crm.dynamics.com");
-                }
-
-                settings.ServerName = pPropBag.Read(_strServerName, defaultServer);
-                settings.UseSSL = pPropBag.Read(_strUseSSL, defaultSSL);
-                settings.UseIFD = pPropBag.Read(_strUseIFD, false);
-                settings.UseOnline = pPropBag.Read(_strUseOnline, defaultOnline);
-                settings.UseOffice365 = pPropBag.Read(_strUseOffice365, defaultOnline);
-                settings.ServerPort = pPropBag.Read(_strServerPort, defaultPort);
-                settings.HomeRealm = pPropBag.Read(_strHomeRealm, "");
-
-                //settings.Username = pPropBag.Read(_strUsername, "");
-                //settings.Password = pPropBag.Read(_strPassword, "");
-                settings.Domain = pPropBag.Read(_strDomain, "");
-                settings.UseWindowsAuth = pPropBag.Read(_strUseWindowsAuth, false);
-                settings.IsActive = pPropBag.HasSetting(_strOrganization);
-                settings.CrmOrg = pPropBag.Read(_strOrganization, "DEV-CRM");
-                settings.EntitiesToIncludeString = pPropBag.Read(_strIncludeEntities, "account, contact, systemuser");
-
-                settings.IncludeNonStandard = pPropBag.Read(_strIncludeNonStandard, false);
-
-                settings.Dirty = false;
-            }
-            return VSConstants.S_OK;
-        }
-
-        #endregion Solution Properties
-
+        
         #region User Options
 
         public int LoadUserOptions(IVsSolutionPersistence pPersistence, uint grfLoadOpts)
@@ -286,11 +169,11 @@ namespace CrmCodeGenerator.VSPackage
                     switch (pszKey)
                     {
                         case _strSolutionPersistanceKey + _strUsername:
-                            settings.Username = value;
+                            _settings.Username = value;
                             break;
 
                         case _strSolutionPersistanceKey + _strPassword:
-                            settings.Password = value;
+                            _settings.Password = value;
                             break;
 
                         default:
@@ -320,11 +203,11 @@ namespace CrmCodeGenerator.VSPackage
                 switch (pszKey)
                 {
                     case _strSolutionPersistanceKey + _strUsername:
-                        value = settings.Username;
+                        value = _settings.Username;
                         break;
 
                     case _strSolutionPersistanceKey + _strPassword:
-                        value = settings.Password;
+                        value = _settings.Password;
                         break;
 
                     default:
@@ -370,7 +253,7 @@ namespace CrmCodeGenerator.VSPackage
             {
                 AddTemplate();
 
-                settings.IsActive = true;  // start saving the properties to the *.sln
+                _settings.IsActive = true;  // start saving the properties to the *.sln
             }
             catch (UserException e)
             {
@@ -388,7 +271,7 @@ namespace CrmCodeGenerator.VSPackage
             var dte2 = this.GetService(typeof(SDTE)) as EnvDTE80.DTE2;
 
             var project = dte2.GetSelectedProject();
-            if (project == null || string.IsNullOrWhiteSpace(project.FullName))
+            if (string.IsNullOrWhiteSpace(project?.FullName))
             {
                 throw new UserException("Please select a project first");
             }
@@ -401,8 +284,8 @@ namespace CrmCodeGenerator.VSPackage
                 if (((AddTemplate)sender).Canceled == true)
                     return;
 
-                var templatePath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), m.Props.Template));  //GetFullpath removes un-needed relative paths  (ie if you are putting something in the solution directory)
-                var configPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"));
+                var templatePath = Path.GetFullPath(Path.Combine(project.GetProjectDirectory(), m.Props.Template));  //GetFullpath removes un-needed relative paths  (ie if you are putting something in the solution directory)
+                var configPath = Path.GetFullPath(Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"));
 
                 AddFileToProject(project, m, configPath);
 
@@ -413,7 +296,7 @@ namespace CrmCodeGenerator.VSPackage
 
         private void AddFileToProject(Project project, AddTemplate m, string templatePath, bool runCustomTool = false)
         {
-            if (System.IO.File.Exists(templatePath))
+            if (File.Exists(templatePath))
             {
                 var results = VsShellUtilities.ShowMessageBox(ServiceProvider.GlobalProvider, "'" + templatePath + "' already exists, are you sure you want to overwrite?", "Overwrite", OLEMSGICON.OLEMSGICON_QUERY, OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL, OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
                 if (results != 6)
@@ -424,17 +307,17 @@ namespace CrmCodeGenerator.VSPackage
                 pi?.Document?.Close(vsSaveChanges.vsSaveChangesNo);
             }
 
-            var templateSamplesPath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates");
-            var defaultTemplatePath = System.IO.Path.Combine(templateSamplesPath, m.DefaultTemplate.SelectedValue.ToString());
-            if (!System.IO.File.Exists(defaultTemplatePath))
+            var templateSamplesPath = Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates");
+            var defaultTemplatePath = Path.Combine(templateSamplesPath, m.DefaultTemplate.SelectedValue.ToString());
+            if (!File.Exists(defaultTemplatePath))
             {
                 throw new UserException("T4Path: " + defaultTemplatePath + " is missing or you can access it.");
             }
 
-            var dir = System.IO.Path.GetDirectoryName(templatePath);
-            if (!System.IO.Directory.Exists(dir))
+            var dir = Path.GetDirectoryName(templatePath);
+            if (!Directory.Exists(dir))
             {
-                System.IO.Directory.CreateDirectory(dir);
+                Directory.CreateDirectory(dir);
             }
 
             Status.Update("Adding " + templatePath + " to project");
@@ -443,13 +326,13 @@ namespace CrmCodeGenerator.VSPackage
             // the error will persit until you close Visual Studio. The solution is to add
             // a blank file, then overwrite it
             // http://stackoverflow.com/questions/17993874/add-template-file-without-custom-tool-to-project-programmatically
-            var blankTemplatePath = System.IO.Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates\Blank.tt");
-            System.IO.File.Copy(blankTemplatePath, templatePath, true);
+            var blankTemplatePath = Path.Combine(DteHelper.AssemblyDirectory(), @"Resources\Templates\Blank.tt");
+            File.Copy(blankTemplatePath, templatePath, true);
 
             var p = project.ProjectItems.AddFromFile(templatePath);
             p.Properties.SetValue("CustomTool", "");
 
-            System.IO.File.Copy(defaultTemplatePath, templatePath, true);
+            File.Copy(defaultTemplatePath, templatePath, true);
 
             if (runCustomTool)
             {
@@ -461,7 +344,8 @@ namespace CrmCodeGenerator.VSPackage
 
         public int OnAfterCloseSolution(object pUnkReserved)
         {
-            settings.IsActive = false; return VSConstants.S_OK;
+            _settings.IsActive = false;
+            return VSConstants.S_OK;
         }
 
         public int OnAfterClosingChildren(IVsHierarchy pHierarchy)

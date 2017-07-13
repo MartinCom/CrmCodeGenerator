@@ -1,8 +1,7 @@
-﻿using System;
+﻿using System.IO;
 using CrmCodeGenerator.VSPackage.Model;
 using EnvDTE;
 using EnvDTE80;
-using Microsoft.VisualStudio.Shell.Interop;
 using Newtonsoft.Json;
 
 namespace CrmCodeGenerator.VSPackage.Helpers
@@ -12,16 +11,34 @@ namespace CrmCodeGenerator.VSPackage.Helpers
         public static Settings ReadFromJsonFile(DTE2 dte2)
         {
             Project project = dte2.GetSelectedProject();
-            //if (project == null || string.IsNullOrWhiteSpace(project.FullName))
-            //{
-            //    throw new UserException("Please select a project first");
-            //}
-            
-            var configPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"));
+
+            if (project == null)
+            {
+                return null;
+            }
+
+            var configPath = Path.GetFullPath(Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"));
+
+            if (!File.Exists(configPath))
+            {
+                string dir = Path.GetDirectoryName(configPath);
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+
+                Status.Update("Adding " + configPath + " to project");
+
+                string templateSamplesPath = Path.Combine(DteHelper.AssemblyDirectory(), @"Resources");
+
+                string defaultTemplatePath = Path.Combine(templateSamplesPath, "codegeneratorconfig.json");
+
+                File.Copy(defaultTemplatePath, configPath, true);
+
+                ProjectItem p = project.ProjectItems.AddFromFile(configPath);
+            }
 
             string configurationJson = System.IO.File.ReadAllText(configPath);
-            
-            //string configurationJson = "{\"UseSSL\":true,\"UseIFD\":false,\"ServerName\":\"servername\",\"UseOnline\":false,\"Domain\":\"defaultdomain\",\"UseOffice365\":false,\"ServerPort\":null,\"HomeRealm\":\"\",\"UseWindowsAuth\":false,\"IsActive\":false,\"CrmOrg\":\"DEV-CRM\",\"EntitiesToIncludeString\":\"account, contact\",\"IncludeNonStandard\":false}";
 
             SettingsModel model = JsonConvert.DeserializeObject<SettingsModel>(configurationJson);
 
@@ -43,32 +60,30 @@ namespace CrmCodeGenerator.VSPackage.Helpers
                 Dirty = false
             };
 
-            //settings.Username = pPropBag.Read(_strUsername, "");
-            //settings.Password = pPropBag.Read(_strPassword, "");
-
             return settings;
         }
 
-        public static void CreateDefaultJsonFile()
+        public static void WriteToJsonFile(DTE2 dte2, Settings settings)
         {
-        }
-
-        public static void WriteToJsonFile(Settings settings)
-        {
-            SettingsModel model = new SettingsModel();
-            model.Domain = "defaultdomain";
-            model.ServerName = "servername";
-            model.UseIFD = false;
-            model.UseOnline = false;
-            model.UseSSL = true;
-            model.EntitiesToIncludeString = "account, contact";
-            model.CrmOrg = "DEV-CRM";
-            model.HomeRealm = "";
-            model.IncludeNonStandard = false;
-            model.UseWindowsAuth = false;
+            SettingsModel model = new SettingsModel
+            {
+                Domain = settings.Domain,
+                ServerName = settings.ServerName,
+                UseIFD = settings.UseIFD,
+                UseOnline = settings.UseOnline,
+                UseSSL = settings.CanUseSSL,
+                EntitiesToIncludeString = settings.EntitiesToIncludeString,
+                CrmOrg = settings.CrmOrg,
+                HomeRealm = settings.HomeRealm,
+                IncludeNonStandard = settings.IncludeNonStandard,
+                UseWindowsAuth = settings.UseWindowsAuth
+            };
 
             string jsonConf = JsonConvert.SerializeObject(model);
+
+            Project project = dte2.GetSelectedProject();
+
+            System.IO.File.AppendAllText(System.IO.Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"), jsonConf);
         }
-        
     }
 }
