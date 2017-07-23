@@ -7,6 +7,7 @@ using CrmCodeGenerator.VSPackage.Dialogs;
 using CrmCodeGenerator.VSPackage.Helpers;
 using CrmCodeGenerator.VSPackage.Model;
 using CrmCodeGenerator.VSPackage.T4;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Designer.Interfaces;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -110,12 +111,15 @@ namespace CrmCodeGenerator.VSPackage
 
             if (context == null)
             {
-                var dte = Package.GetGlobalService(typeof(SDTE)) as EnvDTE80.DTE2;
+                DTE2 dte = Package.GetGlobalService(typeof(SDTE)) as EnvDTE80.DTE2;
                 settings = ConfigurationFile.ReadFromJsonFile(dte);
-                var m = new Login(dte, settings);
+                Login m = new Login(dte, settings);
                 m.ShowDialog();
-                
+
                 context = m.Context;
+                
+                ConfigurationFile.WriteToJsonFile(dte,m.settings);
+
                 m = null;
 
                 if (context == null)
@@ -129,6 +133,7 @@ namespace CrmCodeGenerator.VSPackage
                         // I don't think a login failure would be considered a invalid model, so we'll restore what was there
                         SaveOutputContent(rgbOutputFileContents, out pcbOutput, System.IO.File.ReadAllText(originalFile));
                     }
+
                     return VSConstants.S_OK;
                 }
             }

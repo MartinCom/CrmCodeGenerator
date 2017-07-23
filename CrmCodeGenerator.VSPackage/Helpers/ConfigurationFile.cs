@@ -83,7 +83,7 @@ namespace CrmCodeGenerator.VSPackage.Helpers
 
             Project project = dte2.GetSelectedProject();
 
-            System.IO.File.AppendAllText(System.IO.Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"), jsonConf);
+            System.IO.File.WriteAllText(System.IO.Path.Combine(project.GetProjectDirectory(), "codegeneratorconfig.json"), jsonConf);
         }
     }
 }
