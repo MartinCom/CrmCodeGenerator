@@ -1,10 +1,10 @@
-﻿using CrmCodeGenerator.VSPackage.Helpers;
+﻿using System.Collections.Generic;
+using System.Linq;
+using CrmCodeGenerator.VSPackage.Helpers;
 using CrmCodeGenerator.VSPackage.Model;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Messages;
 using Microsoft.Xrm.Sdk.Metadata;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace CrmCodeGenerator.VSPackage
 {

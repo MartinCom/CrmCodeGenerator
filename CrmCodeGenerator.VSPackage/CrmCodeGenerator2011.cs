@@ -1,7 +1,13 @@
-﻿using CrmCodeGenerator.VSPackage.Dialogs;
+﻿using System;
+using System.CodeDom.Compiler;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using CrmCodeGenerator.VSPackage.Dialogs;
 using CrmCodeGenerator.VSPackage.Helpers;
 using CrmCodeGenerator.VSPackage.Model;
 using CrmCodeGenerator.VSPackage.T4;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Designer.Interfaces;
 using Microsoft.VisualStudio.OLE.Interop;
@@ -9,11 +15,6 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextTemplating;
 using Microsoft.VisualStudio.TextTemplating.VSHost;
-using System;
-using System.CodeDom.Compiler;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 
 //using VSLangProj80;
 
@@ -110,10 +111,15 @@ namespace CrmCodeGenerator.VSPackage
 
             if (context == null)
             {
-                var dte = Package.GetGlobalService(typeof(SDTE)) as EnvDTE80.DTE2;
-                var m = new Login(dte, settings);
+                DTE2 dte = Package.GetGlobalService(typeof(SDTE)) as EnvDTE80.DTE2;
+                settings = ConfigurationFile.ReadFromJsonFile(dte);
+                Login m = new Login(dte, settings);
                 m.ShowDialog();
+
                 context = m.Context;
+                
+                ConfigurationFile.WriteToJsonFile(dte,m.settings);
+
                 m = null;
 
                 if (context == null)
@@ -127,6 +133,7 @@ namespace CrmCodeGenerator.VSPackage
                         // I don't think a login failure would be considered a invalid model, so we'll restore what was there
                         SaveOutputContent(rgbOutputFileContents, out pcbOutput, System.IO.File.ReadAllText(originalFile));
                     }
+
                     return VSConstants.S_OK;
                 }
             }
