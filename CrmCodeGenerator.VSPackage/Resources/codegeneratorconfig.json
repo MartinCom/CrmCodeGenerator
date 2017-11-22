@@ -1,0 +1,15 @@
+﻿{
+  "UseSSL": true,
+  "UseIFD": false,
+  "ServerName": "servername",
+  "UseOnline": false,
+  "Domain": "defaultdomain",
+  "UseOffice365": false,
+  "ServerPort": null,
+  "HomeRealm": "",
+  "UseWindowsAuth": false,
+  "IsActive": false,
+  "CrmOrg": "DEV-CRM",
+  "EntitiesToIncludeString": "account, contact",
+  "IncludeNonStandard": false
+}

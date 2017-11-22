@@ -29,7 +29,7 @@ namespace CrmCodeGenerator.VSPackage.Model
         protected virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         protected bool SetField<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
@@ -64,34 +64,19 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public string ProjectName
         {
-            get
-            {
-                return _ProjectName;
-            }
-            set
-            {
-                SetField(ref _ProjectName, value);
-            }
+            get => _ProjectName;
+            set => SetField(ref _ProjectName, value);
         }
 
         public string T4Path
         {
-            get
-            {
-                return _T4Path;
-            }
-            set
-            {
-                SetField(ref _T4Path, value);
-            }
+            get => _T4Path;
+            set => SetField(ref _T4Path, value);
         }
 
         public string Template
         {
-            get
-            {
-                return _Template;
-            }
+            get => _Template;
             set
             {
                 SetField(ref _Template, value);
@@ -103,126 +88,66 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public string Folder
         {
-            get
-            {
-                return _Folder;
-            }
-            set
-            {
-                SetField(ref _Folder, value);
-            }
+            get => _Folder;
+            set => SetField(ref _Folder, value);
         }
 
         private bool _NewTemplate;
 
         public bool NewTemplate
         {
-            get
-            {
-                return _NewTemplate;
-            }
-            set
-            {
-                SetField(ref _NewTemplate, value);
-            }
+            get => _NewTemplate;
+            set => SetField(ref _NewTemplate, value);
         }
 
         public string OutputPath
         {
-            get
-            {
-                return _OutputPath;
-            }
-            set
-            {
-                SetField(ref _OutputPath, value);
-            }
+            get => _OutputPath;
+            set => SetField(ref _OutputPath, value);
         }
 
         public string CrmSdkUrl
         {
-            get
-            {
-                return _CrmSdkUrl;
-            }
-            set
-            {
-                SetField(ref _CrmSdkUrl, value);
-            }
+            get => _CrmSdkUrl;
+            set => SetField(ref _CrmSdkUrl, value);
         }
 
         public string Domain
         {
-            get
-            {
-                return _Domain;
-            }
-            set
-            {
-                SetField(ref _Domain, value);
-            }
+            get => _Domain;
+            set => SetField(ref _Domain, value);
         }
 
         public string Username
         {
-            get
-            {
-                return _Username;
-            }
-            set
-            {
-                SetField(ref _Username, value);
-            }
+            get => _Username;
+            set => SetField(ref _Username, value);
         }
 
         public string Password
         {
-            get
-            {
-                return _Password;
-            }
-            set
-            {
-                SetField(ref _Password, value);
-            }
+            get => _Password;
+            set => SetField(ref _Password, value);
         }
 
         public string CrmOrg
         {
-            get
-            {
-                return _CrmOrg;
-            }
-            set
-            {
-                SetField(ref _CrmOrg, value);
-            }
+            get => _CrmOrg;
+            set => SetField(ref _CrmOrg, value);
         }
 
         private ObservableCollection<String> _OnLineServers = new ObservableCollection<String>();
 
         public ObservableCollection<String> OnLineServers
         {
-            get
-            {
-                return _OnLineServers;
-            }
-            set
-            {
-                SetField(ref _OnLineServers, value);
-            }
+            get => _OnLineServers;
+            set => SetField(ref _OnLineServers, value);
         }
         private string _ConnectionString;
         public string ConnectionString
         {
-            get
-            {
-                return _ConnectionString;
-            }
-            set
-            {
-                SetField(ref _ConnectionString, value);
-            }
+            get => _ConnectionString;
+            set => SetField(ref _ConnectionString, value);
         }
 
         //private string _OnlineServer;
@@ -241,14 +166,8 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public string ServerName
         {
-            get
-            {
-                return _ServerName;
-            }
-            set
-            {
-                SetField(ref _ServerName, value);
-            }
+            get => _ServerName;
+            set => SetField(ref _ServerName, value);
         }
 
         private string _ServerPort = "";
@@ -263,52 +182,31 @@ namespace CrmCodeGenerator.VSPackage.Model
                 }
                 return _ServerPort;
             }
-            set
-            {
-                SetField(ref _ServerPort, value);
-            }
+            set => SetField(ref _ServerPort, value);
         }
 
         private string _HomeRealm = "";
 
         public string HomeRealm
         {
-            get
-            {
-                return _HomeRealm;
-            }
-            set
-            {
-                SetField(ref _HomeRealm, value);
-            }
+            get => _HomeRealm;
+            set => SetField(ref _HomeRealm, value);
         }
 
         private ObservableCollection<String> _OrgList = new ObservableCollection<String>();
 
         public ObservableCollection<String> OrgList
         {
-            get
-            {
-                return _OrgList;
-            }
-            set
-            {
-                SetField(ref _OrgList, value);
-            }
+            get => _OrgList;
+            set => SetField(ref _OrgList, value);
         }
 
         private ObservableCollection<String> _TemplateList = new ObservableCollection<String>();
 
         public ObservableCollection<String> TemplateList
         {
-            get
-            {
-                return _TemplateList;
-            }
-            set
-            {
-                SetField(ref _TemplateList, value);
-            }
+            get => _TemplateList;
+            set => SetField(ref _TemplateList, value);
         }
 
         public IOrganizationService CrmConnection { get; set; }
@@ -346,71 +244,41 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public ObservableCollection<string> EntityList
         {
-            get
-            {
-                return _EntityList;
-            }
-            set
-            {
-                SetField(ref _EntityList, value);
-            }
+            get => _EntityList;
+            set => SetField(ref _EntityList, value);
         }
 
         public ObservableCollection<string> _EntitiesSelected;
 
         public ObservableCollection<string> EntitiesSelected
         {
-            get
-            {
-                return _EntitiesSelected;
-            }
-            set
-            {
-                SetField(ref _EntitiesSelected, value);
-            }
+            get => _EntitiesSelected;
+            set => SetField(ref _EntitiesSelected, value);
         }
 
         public string Namespace
         {
-            get
-            {
-                return _Namespace;
-            }
-            set
-            {
-                SetField(ref _Namespace, value);
-            }
+            get => _Namespace;
+            set => SetField(ref _Namespace, value);
         }
 
         public bool Dirty { get; set; }
 
         public bool IncludeNonStandard
         {
-            get
-            {
-                return _IncludeNonStandard;
-            }
-            set
-            {
-                SetField(ref _IncludeNonStandard, value);
-            }
+            get => _IncludeNonStandard;
+            set => SetField(ref _IncludeNonStandard, value);
         }
 
         public bool IncludeUnpublish
         {
-            get
-            {
-                return _IncludeUnpublish;
-            }
-            set
-            {
-                SetField(ref _IncludeUnpublish, value);
-            }
+            get => _IncludeUnpublish;
+            set => SetField(ref _IncludeUnpublish, value);
         }
 
         public bool UseSSL
         {
-            get { return _UseSSL; }
+            get => _UseSSL;
             set
             {
                 if (SetField(ref _UseSSL, value))
@@ -422,7 +290,7 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public bool UseIFD
         {
-            get { return _UseIFD; }
+            get => _UseIFD;
             set
             {
                 if (SetField(ref _UseIFD, value))
@@ -441,7 +309,7 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public bool UseOnline
         {
-            get { return _UseOnline; }
+            get => _UseOnline;
             set
             {
                 if (SetField(ref _UseOnline, value))
@@ -464,7 +332,7 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public bool UseOffice365
         {
-            get { return _UseOffice365; }
+            get => _UseOffice365;
             set
             {
                 if (SetField(ref _UseOffice365, value))
@@ -485,7 +353,7 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public bool UseWindowsAuth
         {
-            get { return _UseWindowsAuth; }
+            get => _UseWindowsAuth;
             set
             {
                 SetField(ref _UseWindowsAuth, value);
@@ -496,7 +364,7 @@ namespace CrmCodeGenerator.VSPackage.Model
 
         public bool UseConnectionString
         {
-            get { return _UseConnectionString; }
+            get => _UseConnectionString;
             set
             {
                 SetField(ref _UseConnectionString, value);
@@ -517,61 +385,19 @@ namespace CrmCodeGenerator.VSPackage.Model
             OnPropertyChanged("CanUseSSL");
         }
 
-        public bool NeedServer
-        {
-            get
-            {
-                return !(UseOnline || UseOffice365);
-            }
-        }
+        public bool NeedServer => !(UseOnline || UseOffice365);
 
-        public bool NeedOnlineServer
-        {
-            get
-            {
-                return (UseOnline || UseOffice365);
-            }
-        }
+        public bool NeedOnlineServer => (UseOnline || UseOffice365);
 
-        public bool NeedServerPort
-        {
-            get
-            {
-                return !(UseOffice365 || UseOnline);
-            }
-        }
+        public bool NeedServerPort => !(UseOffice365 || UseOnline);
 
-        public bool NeedHomeRealm
-        {
-            get
-            {
-                return !(UseIFD || UseOffice365 || UseOnline);
-            }
-        }
+        public bool NeedHomeRealm => !(UseIFD || UseOffice365 || UseOnline);
 
-        public bool NeedCredentials
-        {
-            get
-            {
-                return !UseWindowsAuth;
-            }
-        }
+        public bool NeedCredentials => !UseWindowsAuth;
 
-        public bool CanUseWindowsAuth
-        {
-            get
-            {
-                return !(UseIFD || UseOnline || UseOffice365);
-            }
-        }
+        public bool CanUseWindowsAuth => !(UseIFD || UseOnline || UseOffice365);
 
-        public bool CanUseSSL
-        {
-            get
-            {
-                return !(UseOnline || UseOffice365 || UseIFD);
-            }
-        }
+        public bool CanUseSSL => !(UseOnline || UseOffice365 || UseIFD);
 
         #endregion Read Only Properties
 
@@ -663,7 +489,7 @@ namespace CrmCodeGenerator.VSPackage.Model
             }
             var currentServerName = string.Empty;
 
-            var orgDetails = ConnectionHelper.GetOrganizationDetails(this);
+            OrganizationDetail orgDetails = ConnectionHelper.GetOrganizationDetails(this);
 
             if (orgDetails == null)
             {

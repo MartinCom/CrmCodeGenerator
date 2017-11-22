@@ -19,7 +19,7 @@ namespace CrmCodeGenerator.VSPackage.Dialogs
     public partial class Login : Microsoft.VisualStudio.PlatformUI.DialogWindow
     {
         public Context Context;
-        private Settings settings;
+        public Settings settings;
         private EntityMetadata[] _AllEntities;
         private bool _StillOpen = true;
 
